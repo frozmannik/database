@@ -85,12 +85,12 @@ def make_an_order(basket,orderID): #orderID could be replaced by some internal c
     try:
         price = 0
         for item in basket:
-            sqlstmt = "SELECT `itemPrice` FROM `items` WHERE `itemID` = {} ".format(item)
+            sqlstmt = "SELECT `itemPrice` FROM `items` WHERE `itemID` = {} ".format(item[0])
             cursor.execute(sqlstmt)
             result = cursor.fetchall()
-            price = price +(result[0][0])
-        print "final price is {}".format(price)
-        print "current time is {}".format(datetime.datetime.now())
+            price = price +(result[0][0])*item[1]
+        #print "final price is {}".format(price)
+        #print "current time is {}".format(datetime.datetime.now())
 
         # create an order in `order` table
         time = datetime.datetime.now()
@@ -101,13 +101,14 @@ def make_an_order(basket,orderID): #orderID could be replaced by some internal c
         sqlstmt = "SELECT MAX(`orderID`) FROM `orders`;"
         cursor.execute(sqlstmt)
         result = cursor.fetchall()
-        print result[0][0]
+        #print result[0][0]
         # get a result[0][0] as order id and put it in `utility table` with itemID
 
         for item in basket:
-            sqlstmt ="INSERT INTO `test`.`utility_table` (`itemID`, `orderID`) VALUES ('{}', '{}');".format(item,result[0][0])
-            cursor.execute(sqlstmt)
-            db.commit()
+            for quatity in range(0,item[1]):
+                sqlstmt ="INSERT INTO `test`.`utility_table` (`itemID`, `orderID`) VALUES ('{}', '{}');".format(item[0],result[0][0])
+                cursor.execute(sqlstmt)
+                db.commit()
 
     except mysql.connector.Error as err:
         print "Something went wrong: {}".format(err)
@@ -118,9 +119,12 @@ def make_an_order(basket,orderID): #orderID could be replaced by some internal c
 
 
 
-basket = [1,2,3,100]
+basket = [(1,3),(2,2),(3,2),(99,2)]
 
-make_an_order(basket,21)
+
+
+#make_an_order(basket,23)
+
 
 
 
